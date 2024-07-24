@@ -23,4 +23,4 @@ if __name__ == '__main__':
         con.execute(text("CREATE EXTENSION IF NOT EXISTS postgis"))
         con.execute(text(table_creation_query))
         con.commit()
-    print('table succefully created')
+    print('Table succefully created!')
