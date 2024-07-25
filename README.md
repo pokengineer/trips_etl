@@ -12,4 +12,6 @@ Mount Docker image for the development database, run the following commands to s
 >docker-compose up -d <br>
 >python setup.py <br>
 
+# Perform the stress test
 
+> python stress-test.py
