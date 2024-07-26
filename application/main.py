@@ -76,21 +76,35 @@ class console_application(cmd.Cmd):
     warnings.filterwarnings('ignore')
 
     def do_greet(self, line):
+        """ Test function. prints hello + input given
+        usage:
+        greet facu
+        > hello facu"""
         print("hello " + line)
     
     def do_ETL(self,file):
+        """ETL is used for the main ingestion, followed by the path to the csv file.
+        usage:
+        ETL trips.csv"""
         ingest_trips(file)
     
     def do_avg(self,region):
+        """obtain the weekly average number of trips for an area, defined by a bounding box given by a region, where the parameter is the region name.
+        usage:
+        avg Turin"""
         a = weekly_avg_by_region(region)
         print( a )
 
     def do_avg_box(self,line):
+        """obtain the weekly average number of trips for an area, defined by a bounding box given by coordinates, where the parameters are 4 float values separated by a single space xmin ymin xmax ymax.
+        usage:
+        avg_box 10 40 15 50"""
         coords = [float(x) for x in line.split(" ")]
         a = weekly_avg_by_box( coords[0], coords[1], coords[2], coords[3] )
         print( a )
     
     def do_EOF(self, line):
+        """type EOF to exit the loop"""
         return True
 
 if __name__ == '__main__':
