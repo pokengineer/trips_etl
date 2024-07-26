@@ -21,6 +21,7 @@ if __name__ == '__main__':
     """
     with engine.connect() as con:
         con.execute(text("CREATE EXTENSION IF NOT EXISTS postgis"))
+        con.execute(text("alter database test_db refresh collation version"))
         con.execute(text(table_creation_query))
         con.commit()
     print('Table succefully created!')

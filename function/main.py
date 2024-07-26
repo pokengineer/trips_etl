@@ -6,8 +6,8 @@ import geopandas as gpd
 from datetime import datetime
 import pandas as pd
 from threading import Thread
-
-load_dotenv()
+import cmd
+import warnings
 
 def tripETL( df, engine, i):
     print(f"starting thread {i}")
@@ -43,7 +43,10 @@ def ingest_trips( file='trips.csv' ):
         t.join() 
 
 
-def weekly_avg_by_region( region, engine ):
+def weekly_avg_by_region( region ):
+    params = os.environ
+    engine = create_engine("postgresql+psycopg2://"+ params['DB_USER'] +":"+ params['DB_PASS']+ "@localhost:5432/test_db")
+
     query = """select avg(no_trips)
         from ( select 
         week_no, count(id) as no_trips
@@ -54,7 +57,10 @@ def weekly_avg_by_region( region, engine ):
         result = connection.execute(text(query))
     return result.fetchone().t[0]
 
-def weekly_avg_by_box( xmin, ymin, xmax, ymax, engine ):
+def weekly_avg_by_box( xmin, ymin, xmax, ymax ):
+    params = os.environ
+    engine = create_engine("postgresql+psycopg2://"+ params['DB_USER'] +":"+ params['DB_PASS']+ "@localhost:5432/test_db")
+
     query = """select avg(no_trips)
         from ( select 
         week_no, count(id) as no_trips
@@ -64,3 +70,29 @@ def weekly_avg_by_box( xmin, ymin, xmax, ymax, engine ):
     with engine.connect() as connection:
         result = connection.execute(text(query))
     return result.fetchone().t[0]
+
+class console_application(cmd.Cmd):
+    """Simple command processor used to create proof of concept of trip data ingestion."""
+    warnings.filterwarnings('ignore')
+
+    def do_greet(self, line):
+        print("hello " + line)
+    
+    def do_ETL(self,file):
+        ingest_trips(file)
+    
+    def do_avg(self,region):
+        a = weekly_avg_by_region(region)
+        print( a )
+
+    def do_avg_box(self,line):
+        coords = [float(x) for x in line.split(" ")]
+        a = weekly_avg_by_box( coords[0], coords[1], coords[2], coords[3] )
+        print( a )
+    
+    def do_EOF(self, line):
+        return True
+
+if __name__ == '__main__':
+    load_dotenv()
+    console_application().cmdloop()
