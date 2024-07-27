@@ -1,16 +1,20 @@
 # Data Engineering Challenge
-The task is to build an automatic process to ingest data on an on-demand basis. The data represents trips taken by different vehicles, and include a city, a point of origin and a destination.
+The task is to build an automatic process to ingest geographical data on an on-demand basis. The data represents trips taken by different vehicles, and include a city, a point of origin and a destination.
 
-## Install necesary requirements
-Before running any code it is important to install libraries used in the project. You can install them using pip:
+## Design of the solution
+The Challenge can be achieved using a wide variety of tools, in my project I chose to use Python for the main application and PostgreSQL to store the data. Given the type of data being handled I chose specific libraries and extensions that perform better when using geographic information and I know can be easily integrated with other GIS tools if needed for more complex later analysis.
+Specifically, the decision was to handle data using [Geopandas](https://geopandas.org/) instead of a more easily scalable PySpark dataframe, in case some transformation of the geographical data is needed before storage. I also installed a PostgreSQL extension called [PostGis](https://postgis.net/) that is used for storing and querying geographical locations, maps and areas.
+
+## Install necessary requirements
+Before running any code it is important to have [Python](https://www.python.org/), [pip](https://pypi.org/project/pip/) and [Docker](https://www.docker.com/) installed, and then install the libraries used in the project. You can install them using pip:
 ```
+cd setup
 pip install -r requirements.txt
 ```
 
 ## Create the database
-Mount Docker image for the development database, run the following commands to start the docker image for the database
+Also in the setup folder we will have to mount Docker image for the development database using the file docker-compose.yml, and  then run the python script to setup the creation of the main table used.
 ```
-cd setup
 docker-compose up -d
 python setup.py
 ```
@@ -21,7 +25,7 @@ The main script for the application loop is located inside the application folde
 python main.py
 ```
 
-Once the application is running the interface admits commands in the form command imput
+Once the application is running the interface admits commands in the form command input
 
 ### Ingest and store the data
 For the main ingestion function the command ETL is used, followed by the path to the csv file.
@@ -41,14 +45,16 @@ avg_box 10 40 15 50
 
 
 ## Perform the stress test
+We can also perform a stress test of the solution, in the folder stress_test we can find the script that creates the file. Then we can call it from the main function as we did for trips.csv
 ```
 python stress-test.py
 ```
 
 ## Aditional queries
-Aditionally there where two questions proposed as SQL exercise, the queries have been placed in the queries folder.
-query1.sql answers the question "From the two most commonly appearing regions, which is the latest datasource?"
+Additionally there were two questions proposed as SQL exercise, the queries have been placed in the queries folder.
+### query1.sql 
+answers the question "From the two most commonly appearing regions, which is the latest datasource?"
 by creating a nested query for the most commonly appearing regions, and then a temporary table called latest_trips to get the latest datetime.
-
-query2.sql is a much simpler query, and answers the question "What regions has the "cheap_mobile" datasource appeared in?" 
+### query2.sql
+is a much simpler query, and answers the question "What regions has the "cheap_mobile" datasource appeared in?" 
 filtering the desired datasource in the where clause.
