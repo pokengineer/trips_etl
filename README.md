@@ -4,6 +4,7 @@ The task is to build an automatic process to ingest geographical data on an on-d
 ## Design of the solution
 The Challenge can be achieved using a wide variety of tools, in my project I chose to use Python for the main application and PostgreSQL to store the data. Given the type of data being handled I chose specific libraries and extensions that perform better when using geographic information and I know can be easily integrated with other GIS tools if needed for more complex later analysis.
 Specifically, the decision was to handle data using [Geopandas](https://geopandas.org/) instead of a more easily scalable PySpark dataframe, in case some transformation of the geographical data is needed before storage. I also installed a PostgreSQL extension called [PostGis](https://postgis.net/) that is used for storing and querying geographical locations, maps and areas.
+The only extra column added on the ETL process was a week number column, as it seems from the assignments that data partition by week is important for the analysis.
 
 ## Install necessary requirements
 Before running any code it is important to have [Python](https://www.python.org/), [pip](https://pypi.org/project/pip/) and [Docker](https://www.docker.com/) installed, and then install the libraries used in the project. You can install them using pip:
@@ -50,7 +51,7 @@ We can also perform a stress test of the solution, in the folder stress_test we 
 python stress-test.py
 ```
 
-## Aditional queries
+## Additional queries
 Additionally there were two questions proposed as SQL exercise, the queries have been placed in the queries folder.
 ### query1.sql 
 answers the question "From the two most commonly appearing regions, which is the latest datasource?"
@@ -58,3 +59,9 @@ by creating a nested query for the most commonly appearing regions, and then a t
 ### query2.sql
 is a much simpler query, and answers the question "What regions has the "cheap_mobile" datasource appeared in?" 
 filtering the desired datasource in the where clause.
+
+## Further analysis
+After completing the features, it is proposed to sketch up how a cloud version of the project could be set up. I think the best strategy would be to split the functionalities to provide higher cohesion and lower coupling. Ideally I think all analytic tasks (like the region averages and the additional queries) could be easily migrated into serverless cloud functions (Google cloud functions / AWS Lambda) or a table view could be created if the query is always the same.
+As for the main ETL process in situations similar to the stress test it would timeout a typical lambda function, so a containerized solution should be developed to handle the large volume of data. Given the timeframe provided for the challenge I chose to prioritize core functionalities, but I believe it would be advantageous to add more data validation steps (check for extra columns, data types, valid coordinates, etc. ) when extracting the data and when receiving user-inputs.
+
+!["simple cloud diagram"](https://github.com/pokengineer/trips_etl/blob/main/misc/cloud_diagram.png)
