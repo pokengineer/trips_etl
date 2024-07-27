@@ -10,6 +10,9 @@ import cmd
 import warnings
 
 def tripETL( df, engine, i):
+    """
+    tripETL handles each individual thread of the ETL process, here a geopandas dataframe is used to transform the data and load it into the database.
+    """
     print(f"starting thread {i}")
     # Extract
     gdf = gpd.GeoDataFrame( df )
@@ -27,6 +30,9 @@ def tripETL( df, engine, i):
 
 
 def ingest_trips( file='trips.csv' ):
+    """
+    ingest_trips handles the ETL process and creates the threads to handle larger files.
+    """
     params = os.environ
     # Connect to postgis
     engine = create_engine("postgresql+psycopg2://"+ params['DB_USER'] +":"+ params['DB_PASS']+ "@localhost:5432/test_db")
@@ -44,6 +50,10 @@ def ingest_trips( file='trips.csv' ):
 
 
 def weekly_avg_by_region( region ):
+    """
+    obtain the weekly average number of trips for an area, defined by a bounding box given by a region, where the parameter is the region name.
+    """
+    
     params = os.environ
     engine = create_engine("postgresql+psycopg2://"+ params['DB_USER'] +":"+ params['DB_PASS']+ "@localhost:5432/test_db")
 
@@ -58,6 +68,9 @@ def weekly_avg_by_region( region ):
     return result.fetchone().t[0]
 
 def weekly_avg_by_box( xmin, ymin, xmax, ymax ):
+    """
+    obtain the weekly average number of trips for an area, defined by a bounding box given by coordinates, where the parameters are 4 float values separated by a single space xmin ymin xmax ymax.
+    """
     params = os.environ
     engine = create_engine("postgresql+psycopg2://"+ params['DB_USER'] +":"+ params['DB_PASS']+ "@localhost:5432/test_db")
 
@@ -99,8 +112,11 @@ class console_application(cmd.Cmd):
         """obtain the weekly average number of trips for an area, defined by a bounding box given by coordinates, where the parameters are 4 float values separated by a single space xmin ymin xmax ymax.
         usage:
         avg_box 10 40 15 50"""
-        coords = [float(x) for x in line.split(" ")]
-        a = weekly_avg_by_box( coords[0], coords[1], coords[2], coords[3] )
+        try:
+            coords = [float(x) for x in line.split(" ")]
+            a = weekly_avg_by_box( coords[0], coords[1], coords[2], coords[3] )
+        except:
+            a = "invalid coordinates, check help avg_box for help on the usage of the method"
         print( a )
     
     def do_EOF(self, line):
